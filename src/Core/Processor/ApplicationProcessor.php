@@ -21,16 +21,19 @@ class ApplicationProcessor implements ProcessorInterface
     /**
      * Handle application processors
      * @param $severType
+     * @param array $serverParams
      * @return bool
      * @throws \ReflectionException
      */
-    public function handle($severType): bool
+    public function handle($severType, $serverParams = []): bool
     {
         /**
          * @var $serverObj Server
          */
-        $serverObj = HermesApplication::TASK_SERVER_MAP[$severType];
+        $serverClass = HermesApplication::TASK_SERVER_MAP[$severType];
+        $serverObj = new $serverClass();
         $this->registerEvent($serverObj, $this->initEvent($severType));
+        $serverObj->init(...$serverParams);
         $serverObj->start();
         return true;
     }
@@ -38,9 +41,8 @@ class ApplicationProcessor implements ProcessorInterface
     /**
      * @param Server $server
      * @param $event
-     * @return
      */
-    public function registerEvent(Server $server, $event): array
+    public function registerEvent(Server $server, $event): void
     {
         foreach ($event as $eventName => $eventValue) {
             $server->registerEvent($eventName, $eventValue);

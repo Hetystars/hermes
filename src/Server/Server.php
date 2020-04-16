@@ -194,7 +194,7 @@ abstract class Server implements ServerInterface
      * @param $mode
      * @param $type
      */
-    public function init($host, $port, $mode, $type): void
+    public function init($host, $port, $mode, $type)
     {
         $this->host = $host;
         $this->port = $port;

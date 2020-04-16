@@ -31,6 +31,12 @@ class HermesApplication
 
 
     /**
+     * @var array
+     */
+    protected $serverParams;
+
+
+    /**
      * @var
      */
     public const
@@ -62,9 +68,10 @@ class HermesApplication
             if (!$this->beforeRun()) {
                 return;
             }
-            $this->getProcessor()->handle($this->serverType);
+            $this->getProcessor()->handle($this->serverType, $this->serverParams);
         } catch (Throwable $e) {
-            echo $e->getTraceAsString(), "\n";
+            echo $e->getMessage(), PHP_EOL,
+            $e->getTraceAsString(), PHP_EOL;
         }
     }
 
@@ -75,6 +82,16 @@ class HermesApplication
     public function setServerType($type): self
     {
         $this->serverType = $type;
+        return $this;
+    }
+
+    /**
+     * @param $type
+     * @return $this
+     */
+    public function setServerParams($serverParams): self
+    {
+        $this->serverParams = $serverParams;
         return $this;
     }
 
