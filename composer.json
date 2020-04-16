@@ -13,7 +13,7 @@
     "ext-pdo": "*",
     "ext-redis": "*",
     "ext-json": "*",
-    "swoft/swoole-ide-helper": "*"
+    "swoole/ide-helper": "*"
   },
   "autoload": {
     "classmap": [
