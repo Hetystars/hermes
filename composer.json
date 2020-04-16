@@ -19,15 +19,13 @@
     "classmap": [
     ],
     "psr-4": {
-      "Swoft\\Memcached\\": "src/"
+      "Hermes\\": "src/"
     },
     "files": [
     ]
   },
   "autoload-dev": {
     "psr-4": {
-      "SwoftTest\\Memcached\\Unit\\": "test/unit",
-      "SwoftTest\\Memcached\\Testing\\": "test/testing"
     }
   },
   "require-dev": {
