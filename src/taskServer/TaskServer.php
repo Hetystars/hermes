@@ -133,6 +133,14 @@ class TaskServer extends Server
     }
 
     /**
+     * @param $setting
+     */
+    public function setting($setting): void
+    {
+        $this->setting = $setting;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getSetting(): array

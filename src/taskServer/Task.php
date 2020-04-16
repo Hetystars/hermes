@@ -51,14 +51,20 @@ class Task
     {
         $this->host = $host;
         $this->port = $port;
-        $this->iniInstance();
     }
 
 
-    private function iniInstance(): void
+    /**
+     * @return Redis
+     */
+    private function getInstance()
     {
-        $redis = new Redis;
-        static::$instance = $redis->connect($this->host, $this->port);
+        if (empty(static::$instance)) {
+            $redis = new Redis;
+            $redis->connect($this->host, $this->port);
+            static::$instance = $redis;
+        }
+        return static::$instance;
     }
 
     /**
@@ -66,9 +72,9 @@ class Task
      * @param array $params
      * @return bool|int
      */
-    protected static function pushTask(string $fd, array $params)
+    protected function pushTask(string $fd, array $params)
     {
-        return static::$instance->lpush($fd, json_encode($params));
+        return $this->getInstance()->lpush($fd, json_encode($params));
     }
 
 
@@ -79,9 +85,9 @@ class Task
      * @param array $params
      * @return bool|int
      */
-    public static function async(string $fd, string $taskEvent, string $method, array $params)
+    public function async(string $fd, string $taskEvent, string $method, array $params)
     {
-        return self::pushTask($fd, [$taskEvent, $method, $params]);
+        return $this->pushTask($fd, [$taskEvent, $method, $params]);
     }
 
 }
