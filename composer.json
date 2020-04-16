@@ -1,0 +1,39 @@
+{
+  "name": "task/hermes",
+  "type": "library",
+  "version": "v1.0.0",
+  "keywords": [
+    "php",
+    "swoole"
+  ],
+  "description": "task hermes",
+  "license": "Apache-2.0",
+  "require": {
+    "php": ">7.1",
+    "ext-pdo": "*",
+    "ext-redis": "*",
+    "ext-json": "*",
+    "swoft/swoole-ide-helper": "*"
+  },
+  "autoload": {
+    "classmap": [
+    ],
+    "psr-4": {
+      "Swoft\\Memcached\\": "src/"
+    },
+    "files": [
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SwoftTest\\Memcached\\Unit\\": "test/unit",
+      "SwoftTest\\Memcached\\Testing\\": "test/testing"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.5"
+  },
+  "scripts": {
+    "test": "php run.php -c phpunit.xml"
+  }
+}
