@@ -19,7 +19,7 @@
     "classmap": [
     ],
     "psr-4": {
-      "hermes\\": "src/"
+      "Hermes\\": "src/"
     },
     "files": [
     ]
