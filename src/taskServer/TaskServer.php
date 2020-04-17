@@ -58,6 +58,7 @@ class TaskServer extends Server
         });
 
         $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
+            //@TODO 待优化，每次回调都更新pid文件效率过低
             $this->setPid($server->manager_pid, $server->worker_pid);
             //处理任务
             $params = json_decode($data[1], true);
