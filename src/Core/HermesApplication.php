@@ -23,7 +23,8 @@ class HermesApplication
      *  'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,
      *  'server_setting' => [],
      *  'server_event' => ['prometheus\util\AjaxHandler'],
-     *  'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE, SWOOLE_SOCK_TCP]
+     *  'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE, SWOOLE_SOCK_TCP],
+     *  'app_path' => '/var/http/www/as-project/'
      * ]
      * @var
      */
@@ -53,6 +54,11 @@ class HermesApplication
      * @var array
      */
     protected $setting;
+
+    /**
+     * @var string
+     */
+    protected $appPath;
 
     /**
      * @var
@@ -88,7 +94,7 @@ class HermesApplication
             }
             $this->iniServer()
                 ->getProcessor()
-                ->handle($this->serverType, $this->serverParams, $this->serverEvents, $this->setting);
+                ->handle($this->serverType, $this->serverParams, $this->serverEvents, $this->setting, $this->appPath);
         } catch (Throwable $e) {
             echo $e->getMessage(), PHP_EOL,
             $e->getTraceAsString(), PHP_EOL;
@@ -104,6 +110,7 @@ class HermesApplication
         return $this->setServerEvents($this->config['server_event'])
             ->setServerType($this->config['server_type'])
             ->setServerParams($this->config['server_params'])
+            ->setAppPath($this->config['app_path'])
             ->setServerSetting($this->config['server_setting']);
     }
 
@@ -115,6 +122,16 @@ class HermesApplication
     {
         require_once $configFile;
         $this->config = $config;
+        return $this;
+    }
+
+    /**
+     * @param $appPath
+     * @return $this
+     */
+    public function setAppPath($appPath): self
+    {
+        $this->appPath = $appPath;
         return $this;
     }
 

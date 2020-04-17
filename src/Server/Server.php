@@ -69,6 +69,10 @@ abstract class Server implements ServerInterface
      */
     protected $setting = [];
 
+    /**
+     * @var string
+     */
+    protected $appPath;
 
     /**
      * The server unique name
@@ -82,12 +86,12 @@ abstract class Server implements ServerInterface
      *
      * @var string
      */
-    protected $pidFile = '@runtime/Hermes.pid';
+    protected $pidFile = 'runtime/Hermes.pid';
 
     /**
      * @var string
      */
-    protected $commandFile = '@runtime/Hermes.command';
+    protected $commandFile = 'runtime/Hermes.command';
 
     /**
      * Record started server PIDs and with current workerId
@@ -168,7 +172,7 @@ abstract class Server implements ServerInterface
      *
      * @var string
      */
-    private $id = '';
+    private $mangerPid = '';
 
     /**
      * Server unique id
@@ -206,6 +210,44 @@ abstract class Server implements ServerInterface
         $this->port = $port;
         $this->mode = $mode;
         $this->type = $type;
+    }
+
+    /**
+     * Shutdown server
+     */
+    public function shutdown(): void
+    {
+        exec(sprintf('kill -15 %d', $this->mangerPid));
+    }
+
+
+    /**
+     * manger pid,worker pid
+     * @return array
+     */
+    public function getPid(): array
+    {
+        $pidStr = file_get_contents($this->appPath . '/' . $this->pidFile);
+        return explode(',', $pidStr);
+    }
+
+    /**
+     * manger pid,worker pid
+     * @param $mangerPid
+     * @param $workerPid
+     * @return void
+     */
+    public function setPid($mangerPid, $workerPid): void
+    {
+        file_put_contents($this->appPath . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
+    }
+
+    /**
+     * @param $appPath
+     */
+    public function setFilePath(string $appPath): void
+    {
+        $this->appPath = $appPath;
     }
 
 }

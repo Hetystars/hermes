@@ -34,6 +34,7 @@ class TaskServer extends Server
      */
     public function start(): void
     {
+        $this->shutdown();
         $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode, $this->type);
         $this->startSwoole();
     }
@@ -57,11 +58,13 @@ class TaskServer extends Server
         });
 
         $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
+            $this->setPid($this->swooleServer->manager_pid, $this->swooleServer->worker_pid);
             //处理任务
             $params = json_decode($data[1], true);
             $response = $this->handleTask($params[0], $params[1], $params[2]);
             return [$params[0], $params[1], $response];
         });
+
 
         $this->swooleServer->start();
     }

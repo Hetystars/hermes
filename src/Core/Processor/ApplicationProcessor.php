@@ -23,9 +23,10 @@ class ApplicationProcessor implements ProcessorInterface
      * @param array $serverParams
      * @param array $serverEvents
      * @param array $setting
+     * @param string $appPath
      * @return bool
      */
-    public function handle(int $severType, array $serverParams = [], array $serverEvents = [], array $setting = []): bool
+    public function handle(int $severType, array $serverParams = [], array $serverEvents = [], array $setting = [], string $appPath = ''): bool
     {
         /**
          * @var $serverObj Server
@@ -33,6 +34,7 @@ class ApplicationProcessor implements ProcessorInterface
         $serverClass = HermesApplication::TASK_SERVER_MAP[$severType];
         $serverObj = new $serverClass();
         $this->registerEvent($serverObj, $serverEvents);
+        $serverObj->setFilePath($appPath);
         $serverObj->init(...$serverParams);
         $serverObj->setting($setting);
         $serverObj->start();

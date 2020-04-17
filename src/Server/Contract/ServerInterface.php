@@ -82,4 +82,9 @@ interface ServerInterface
      */
     public function registerEvent(string $eventName, $event);
 
+    /**
+     * @return mixed
+     */
+    public function shutdown();
+
 }
