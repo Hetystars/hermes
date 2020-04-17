@@ -26,7 +26,7 @@ $swoole->iniConfig($configFilePath)
     
 3.同步代码中开启异步任务
 ```
-$task = new \Hermes\TaskServer\Task('127.0.0.1', 9501);//swoole服务器配置，host,port,模式，配置文件中server_params ，host,port
+$task = new \Hermes\TaskServer\Task('127.0.0.1', 9501);//swoole服务器配置，host,port,模式，配置文件中server_params ,host,port
 $taskEvent = 'test';//taskEvent 名称,即类常量EVENT_NAME的值
 $taskMethod = 'test';//taskEvent 方法名称
 $params = []; //方法参数
