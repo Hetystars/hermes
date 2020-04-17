@@ -31,4 +31,17 @@ class EventManger
         }
         return $allEvent;
     }
+
+    /**
+     * @param $events
+     * @return array
+     */
+    public function formatEvent($events): array
+    {
+        $allEvent = [];
+        foreach ($events as $eventClass) {
+            $allEvent[$eventClass::EVENT_NAME] = $eventClass;
+        }
+        return $allEvent;
+    }
 }

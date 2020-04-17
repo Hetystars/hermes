@@ -16,7 +16,8 @@ interface ProcessorInterface
      * @param int $severType
      * @param array $serverParams
      * @param array $serverEvents
+     * @param array $setting
      * @return bool
      */
-    public function handle(int $severType, array $serverParams, array $serverEvents): bool;
+    public function handle(int $severType, array $serverParams, array $serverEvents, array $setting): bool;
 }

@@ -8,13 +8,25 @@
 
 namespace Hermes\TaskServer\Contract;
 
-
+/**
+ * Class TaskEvent
+ * @package Hermes\TaskServer\Contract
+ */
 abstract class TaskEvent
 {
     /**
      * @var string
      */
     public const EVENT_NAME = '';
+
+    /**
+     * [
+     * 'method_one'=>'callback_one',
+     * 'method_two'=>'callback_two'
+     * ]
+     * @var array
+     */
+    public const EVENT_CALLBACK_METHOD_MAP = [];
 
 
 }

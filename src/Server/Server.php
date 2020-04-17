@@ -69,6 +69,7 @@ abstract class Server implements ServerInterface
      */
     protected $setting = [];
 
+
     /**
      * The server unique name
      *
@@ -180,6 +181,11 @@ abstract class Server implements ServerInterface
      * @var string
      */
     private $fullCommand = '';
+
+    /**
+     * @var string
+     */
+    public const RESPONSE_LOG = '/tmp/response.log';
 
     /**
      *

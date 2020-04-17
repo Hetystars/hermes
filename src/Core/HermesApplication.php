@@ -19,16 +19,25 @@ use Throwable;
 class HermesApplication
 {
     /**
+     * [
+     *  'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,
+     *  'server_setting' => [],
+     *  'server_event' => ['prometheus\util\AjaxHandler'],
+     *  'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE, SWOOLE_SOCK_TCP]
+     * ]
+     * @var
+     */
+    protected $config;
+
+    /**
      * @var
      */
     protected $processor;
-
 
     /**
      * @var int
      */
     protected $serverType;
-
 
     /**
      * @var array
@@ -39,6 +48,11 @@ class HermesApplication
      * @var array
      */
     protected $serverEvents;
+
+    /**
+     * @var array
+     */
+    protected $setting;
 
     /**
      * @var
@@ -72,12 +86,36 @@ class HermesApplication
             if (!$this->beforeRun()) {
                 return;
             }
-            $this->getProcessor()->handle($this->serverType, $this->serverParams, $this->serverEvents);
+            $this->iniServer()
+                ->getProcessor()
+                ->handle($this->serverType, $this->serverParams, $this->serverEvents, $this->setting);
         } catch (Throwable $e) {
             echo $e->getMessage(), PHP_EOL,
             $e->getTraceAsString(), PHP_EOL;
         }
         echo 'server start success';
+    }
+
+    /**
+     * @return HermesApplication
+     */
+    private function iniServer()
+    {
+        return $this->setServerEvents($this->config['server_event'])
+            ->setServerType($this->config['server_type'])
+            ->setServerParams($this->config['server_params'])
+            ->setServerSetting($this->config['server_setting']);
+    }
+
+    /**
+     * @param string $configFile
+     * @return $this
+     */
+    public function iniConfig(string $configFile)
+    {
+        require_once $configFile;
+        $this->config = $config;
+        return $this;
     }
 
     /**
@@ -108,6 +146,16 @@ class HermesApplication
     public function setServerEvents($serverEvents): self
     {
         $this->serverEvents = $serverEvents;
+        return $this;
+    }
+
+    /**
+     * @param $setting
+     * @return $this
+     */
+    public function setServerSetting($setting): self
+    {
+        $this->setting = $setting;
         return $this;
     }
 

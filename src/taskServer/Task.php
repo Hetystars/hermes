@@ -26,7 +26,6 @@ class Task
      */
     private $port;
 
-
     /**
      * Coroutine
      */

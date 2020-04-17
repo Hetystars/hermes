@@ -26,6 +26,7 @@ class TaskServer extends Server
 {
     use TaskEventTrait;
 
+
     /**
      * Start server
      *
@@ -42,7 +43,7 @@ class TaskServer extends Server
      */
     protected function startSwoole(): void
     {
-        $this->swooleServer->set($this->getSetting());
+        $this->swooleServer->set($this->setting);
         $this->swooleServer->setHandler('LPUSH', function ($fd, $data) {
             $taskId = $this->swooleServer->task($data);
             if ($taskId === false) {
@@ -51,46 +52,64 @@ class TaskServer extends Server
             return RedisServer::format(RedisServer::INT, $taskId);
         });
 
-        $this->swooleServer->on('Finish', function ($response) {
-            $this->taskResponse($response);
+        $this->swooleServer->on('Finish', function ($server, $taskId, $response) {
+            $this->taskResponse(...$response);
         });
 
-        $this->swooleServer->on('Task', function ($serv, $taskId, $workerId, $data) {
+        $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
             //处理任务
             $params = json_decode($data[1], true);
-            $this->handleTask($params[0], $params[1], $params[2]);
+            $response = $this->handleTask($params[0], $params[1], $params[2]);
+            return [$params[0], $params[1], $response];
         });
 
         $this->swooleServer->start();
     }
 
     /**
-     * @param string $taskName
+     * @param string $taskEvent
      * @param string $taskMethod
      * @param array $params
      * @return mixed
      * @throws TaskException
      */
-    protected function handleTask(string $taskName, string $taskMethod, array $params)
+    protected function handleTask(string $taskEvent, string $taskMethod, array $params)
     {
-        if (!isset(static::$eventMap[$taskName])) {
+        if (!isset(static::$eventMap[$taskEvent])) {
             throw new TaskException();
         }
-        $taskObj = new static::$eventMap[$taskName]();
+        $taskObj = new static::$eventMap[$taskEvent]();
         if (!method_exists($taskObj, $taskMethod)) {
             throw new TaskException();
         }
-        return PhpHelper::call([$taskObj, $taskMethod], $params);
+        return PhpHelper::call([$taskObj, $taskMethod], ...$params);
     }
 
 
     /**
-     * @TODO 待实现
-     * @param $response
+     * @param string $taskEvent
+     * @param string $taskMethod
+     * @param array $response
+     * @return mixed
+     * @throws TaskException
      */
-    protected function taskResponse($response)
+    protected function taskResponse(string $taskEvent, string $taskMethod, $response)
     {
-        file_put_contents('/tmp/record.log', PHP_EOL . json_encode($response), FILE_APPEND);
+        if (!isset(static::$eventMap[$taskEvent])) {
+            throw new TaskException();
+        }
+        $taskEventObj = static::$eventMap[$taskEvent];
+        $taskEventCallbackMethodMap = $taskEventObj::EVENT_CALLBACK_METHOD_MAP;
+        if (!empty($taskEventCallbackMethodMap)) {
+            if (isset($taskEventCallbackMethodMap[$taskMethod])) {
+                $taskObj = new $taskEventObj();
+                $callBackMethod = $taskEventCallbackMethodMap[$taskMethod];
+                if (method_exists($taskObj, $callBackMethod)) {
+                    return PhpHelper::call([$taskObj, $callBackMethod], $response);
+                }
+            }
+        }
+        file_put_contents($this->setting['response_log'] ?? static::RESPONSE_LOG, date('Y-m-d H:i:s') . json_encode(['task_event' => $taskEvent, 'task_method' => $taskMethod, 'response' => $response]) . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -138,7 +157,7 @@ class TaskServer extends Server
      */
     public function setting($setting): void
     {
-        $this->setting = $setting;
+        $this->setting = array_merge($this->getDefaultSetting(), $setting);
     }
 
     /**
@@ -146,14 +165,23 @@ class TaskServer extends Server
      */
     public function getSetting(): array
     {
+        return $this->setting;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDefaultSetting(): array
+    {
         return [
             'task_worker_num' => 4,
             'worker_num' => 1,
             'log_file' => '/tmp/swoole.log',
             'log_level' => SWOOLE_LOG_NOTICE,
-            'daemonize' => 1
+            'daemonize' => 1,
+            'enable_coroutine' => false,
+            'response_file' => '/tmp/response.log'
         ];
-        return $this->setting;
     }
 
     /**

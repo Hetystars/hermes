@@ -8,7 +8,10 @@
 
 namespace Hermes\TaskServer\Event;
 
-
+/**
+ * Trait TaskEventTrait
+ * @package Hermes\TaskServer\Event
+ */
 Trait TaskEventTrait
 {
     /**

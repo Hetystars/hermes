@@ -12,8 +12,7 @@ use Exception;
 
 /**
  * Class TaskException
- *
- * @since 2.0
+ * @package Hermes\TaskServer\Exception
  */
 class TaskException extends Exception
 {

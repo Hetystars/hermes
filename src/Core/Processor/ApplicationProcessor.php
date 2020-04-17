@@ -22,9 +22,10 @@ class ApplicationProcessor implements ProcessorInterface
      * @param int $severType
      * @param array $serverParams
      * @param array $serverEvents
+     * @param array $setting
      * @return bool
      */
-    public function handle(int $severType, array $serverParams = [], array $serverEvents = []): bool
+    public function handle(int $severType, array $serverParams = [], array $serverEvents = [], array $setting = []): bool
     {
         /**
          * @var $serverObj Server
@@ -33,6 +34,7 @@ class ApplicationProcessor implements ProcessorInterface
         $serverObj = new $serverClass();
         $this->registerEvent($serverObj, $serverEvents);
         $serverObj->init(...$serverParams);
+        $serverObj->setting($setting);
         $serverObj->start();
         return true;
     }
@@ -43,6 +45,7 @@ class ApplicationProcessor implements ProcessorInterface
      */
     public function registerEvent(Server $server, $event): void
     {
+        $event = (new EventManger())->formatEvent($event);
         foreach ($event as $eventName => $eventValue) {
             $server->registerEvent($eventName, $eventValue);
         }
