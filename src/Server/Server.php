@@ -11,6 +11,7 @@ namespace Hermes\Server;
 
 use Hermes\Server\Contract\ServerInterface;
 use Swoole\Server as CoServer;
+use Swoole\Process;
 
 /**
  * Class Server
@@ -217,7 +218,9 @@ abstract class Server implements ServerInterface
      */
     public function shutdown(): void
     {
-        exec(sprintf('kill -15 %d', $this->mangerPid));
+        $pid = $this->getPid();
+        Process::kill((int)$pid[0], 15);
+        usleep(10000);
     }
 
 
@@ -239,6 +242,11 @@ abstract class Server implements ServerInterface
      */
     public function setPid($mangerPid, $workerPid): void
     {
+        $filePath = $this->appPath . '/runtime';
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777);
+            chmod($filePath, 0777);
+        }
         file_put_contents($this->appPath . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
     }
 
