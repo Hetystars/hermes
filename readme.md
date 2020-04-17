@@ -1,6 +1,6 @@
 #### swoole task
 
-####使用说明
+#### 使用说明
 
 1.添加配置文件
 
@@ -24,7 +24,7 @@ $swoole->iniConfig($configFilePath)
     ->run();
 ```  
     
-3.同步代码中开启弄步任务
+3.同步代码中开启异步任务
 ```
 $task = new \Hermes\TaskServer\Task('127.0.0.1', 9501);//swoole服务器配置，host,port,模式，配置文件中server_params ，host,port
 $taskEvent = 'test';//taskEvent 名称,即类常量EVENT_NAME的值
