@@ -19,20 +19,19 @@ class ApplicationProcessor implements ProcessorInterface
 {
 
     /**
-     * Handle application processors
-     * @param $severType
+     * @param int $severType
      * @param array $serverParams
+     * @param array $serverEvents
      * @return bool
-     * @throws \ReflectionException
      */
-    public function handle($severType, $serverParams = []): bool
+    public function handle(int $severType, array $serverParams = [], array $serverEvents = []): bool
     {
         /**
          * @var $serverObj Server
          */
         $serverClass = HermesApplication::TASK_SERVER_MAP[$severType];
         $serverObj = new $serverClass();
-        $this->registerEvent($serverObj, $this->initEvent($severType));
+        $this->registerEvent($serverObj, $serverEvents);
         $serverObj->init(...$serverParams);
         $serverObj->start();
         return true;

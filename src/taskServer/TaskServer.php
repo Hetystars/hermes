@@ -57,7 +57,8 @@ class TaskServer extends Server
 
         $this->swooleServer->on('Task', function ($serv, $taskId, $workerId, $data) {
             //处理任务
-            $this->handleTask(...$data);
+            $params = json_decode($data[1], true);
+            $this->handleTask($params[0], $params[1], $params[2]);
         });
 
         $this->swooleServer->start();
@@ -145,6 +146,13 @@ class TaskServer extends Server
      */
     public function getSetting(): array
     {
+        return [
+            'task_worker_num' => 4,
+            'worker_num' => 1,
+            'log_file' => '/tmp/swoole.log',
+            'log_level' => SWOOLE_LOG_NOTICE,
+            'daemonize' => 1
+        ];
         return $this->setting;
     }
 

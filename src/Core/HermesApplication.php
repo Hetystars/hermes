@@ -35,6 +35,10 @@ class HermesApplication
      */
     protected $serverParams;
 
+    /**
+     * @var array
+     */
+    protected $serverEvents;
 
     /**
      * @var
@@ -68,11 +72,12 @@ class HermesApplication
             if (!$this->beforeRun()) {
                 return;
             }
-            $this->getProcessor()->handle($this->serverType, $this->serverParams);
+            $this->getProcessor()->handle($this->serverType, $this->serverParams, $this->serverEvents);
         } catch (Throwable $e) {
             echo $e->getMessage(), PHP_EOL,
             $e->getTraceAsString(), PHP_EOL;
         }
+        echo 'server start success';
     }
 
     /**
@@ -86,12 +91,23 @@ class HermesApplication
     }
 
     /**
-     * @param $type
+     * @param $serverParams
      * @return $this
      */
     public function setServerParams($serverParams): self
     {
         $this->serverParams = $serverParams;
+        return $this;
+    }
+
+
+    /**
+     * @param $serverEvents
+     * @return $this
+     */
+    public function setServerEvents($serverEvents): self
+    {
+        $this->serverEvents = $serverEvents;
         return $this;
     }
 
@@ -106,7 +122,7 @@ class HermesApplication
     /**
      * @return ApplicationProcessor
      */
-    protected function getProcessor()
+    protected function getProcessor(): ApplicationProcessor
     {
         return new ApplicationProcessor();
     }
