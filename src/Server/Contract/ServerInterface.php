@@ -44,6 +44,13 @@ interface ServerInterface
      */
     public function stop(): bool;
 
+    /**
+     * restart server
+     *
+     * @return bool
+     */
+    public function restart(): bool;
+
 
     /**
      * @return string
@@ -82,9 +89,5 @@ interface ServerInterface
      */
     public function registerEvent(string $eventName, $event);
 
-    /**
-     * @return mixed
-     */
-    public function shutdown();
 
 }

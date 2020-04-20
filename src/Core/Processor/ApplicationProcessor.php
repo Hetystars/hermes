@@ -19,25 +19,61 @@ class ApplicationProcessor implements ProcessorInterface
 {
 
     /**
+     * @param string $command
      * @param int $severType
      * @param array $serverParams
      * @param array $serverEvents
      * @param array $setting
-     * @param string $appPath
      * @return bool
      */
-    public function handle(int $severType, array $serverParams = [], array $serverEvents = [], array $setting = [], string $appPath = ''): bool
+    public function handle(string $command, int $severType, array $serverParams = [], array $serverEvents = [], array $setting = []): bool
     {
         /**
          * @var $serverObj Server
          */
         $serverClass = HermesApplication::TASK_SERVER_MAP[$severType];
         $serverObj = new $serverClass();
-        $this->registerEvent($serverObj, $serverEvents);
-        $serverObj->setFilePath($appPath);
-        $serverObj->init(...$serverParams);
-        $serverObj->setting($setting);
-        $serverObj->start();
+        switch ($command) {
+            case HermesApplication::COMMAND_STOP:
+                return $serverObj->stop();
+            case HermesApplication::COMMAND_INSTALL:
+                return $this->install();
+            case HermesApplication::COMMAND_RESTART:
+            case HermesApplication::COMMAND_START:
+                $this->registerEvent($serverObj, $serverEvents);
+                $serverObj->init(...$serverParams);
+                $serverObj->setting($setting);
+                $serverObj->$command();
+        }
+        return true;
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function install(): bool
+    {
+        file_put_contents(HERMES_ROOT . '/bin/hermes.php', file_get_contents(HERMES_ROOT . '/vendor/Hermes/bin/hermes.php'));
+        $configStr = <<<STR
+<?php
+return [
+       'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,//swoole server 类型，目前仅支持TASK_SERVER类型
+       'server_setting' => [
+            'task_worker_num' => 4,
+            'worker_num' => 1,
+            'log_file' => '/tmp/swoole.log',
+            'log_level' => SWOOLE_LOG_NOTICE,
+            'daemonize' => 1,
+            'enable_coroutine' => false,
+            'response_file' => '/tmp/response.log'
+       ],//swoole 设置
+       'server_event' => ['prometheus\util\AjaxHandler'],//需要异步调用的任务，需异步调用的任务需继承Hermes\TaskServer\Contract\TaskEvent,并重写类常量const EVENT_NAME(taskEvent名称，必写),EVENT_CALLBACK_METHOD_MAP(异步任务回调设置，可不写)
+       'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE],//swoole服务器配置,host,port,模式
+   ];
+STR;
+        file_put_contents(HERMES_ROOT . '/config.php', $configStr);
+        echo 'install success' . PHP_EOL . 'please run php bin/hermes start';
         return true;
     }
 

@@ -34,8 +34,7 @@ class TaskServer extends Server
      */
     public function start(): void
     {
-        $this->shutdown();
-        $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode, $this->type);
+        $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode);
         $this->startSwoole();
     }
 
@@ -65,8 +64,6 @@ class TaskServer extends Server
             $response = $this->handleTask($params[0], $params[1], $params[2]);
             return [$params[0], $params[1], $response];
         });
-
-
         $this->swooleServer->start();
     }
 
@@ -125,15 +122,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
-     */
-    public function stop(): bool
-    {
-        // TODO: Implement stop() method.
-    }
-
-    /**
-     * @inheritDoc
+     * @return int
      */
     public function getPort(): int
     {
@@ -141,7 +130,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return int
      */
     public function getType(): int
     {
@@ -149,7 +138,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return int
      */
     public function getMode(): int
     {
@@ -165,7 +154,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function getSetting(): array
     {
@@ -173,7 +162,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function getDefaultSetting(): array
     {
@@ -189,7 +178,7 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
     public function getTypeName(): string
     {
@@ -213,10 +202,20 @@ class TaskServer extends Server
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function getListener(): array
     {
         // TODO: Implement getListener() method.
+    }
+
+    /**
+     * @return bool
+     * @throws ServerException
+     */
+    public function restart(): bool
+    {
+        $this->stop();
+        $this->start();
     }
 }

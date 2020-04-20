@@ -55,10 +55,6 @@ class HermesApplication
      */
     protected $setting;
 
-    /**
-     * @var string
-     */
-    protected $appPath;
 
     /**
      * @var
@@ -75,6 +71,26 @@ class HermesApplication
     ];
 
     /**
+     * @var string
+     */
+    public const
+        COMMAND_INSTALL = 'install',
+        COMMAND_START = 'start',
+        COMMAND_RESTART = 'restart',
+        COMMAND_STOP = 'stop';
+
+    /**
+     * @var array
+     */
+    public const
+        COMMAND_MAP = [
+        self::COMMAND_INSTALL,
+        self::COMMAND_START,
+        self::COMMAND_RESTART,
+        self::COMMAND_STOP
+    ];
+
+    /**
      * HermesApplication constructor.
      */
     public function __construct()
@@ -84,17 +100,23 @@ class HermesApplication
 
 
     /**
-     * Run application
+     * @param array $params
      */
-    public function run(): void
+    public function run(array $params = []): void
     {
+        $command = $params[0];
+        if (!in_array($command, static::COMMAND_MAP, false)) {
+            echo 'unsupported command ' . $command;
+            return;
+        }
         try {
             if (!$this->beforeRun()) {
                 return;
             }
-            $this->iniServer()
+            $this->iniConfig()
+                ->iniServer()
                 ->getProcessor()
-                ->handle($this->serverType, $this->serverParams, $this->serverEvents, $this->setting, $this->appPath);
+                ->handle($command, $this->serverType, $this->serverParams, $this->serverEvents, $this->setting);
         } catch (Throwable $e) {
             echo $e->getMessage(), PHP_EOL,
             $e->getTraceAsString(), PHP_EOL;
@@ -110,7 +132,6 @@ class HermesApplication
         return $this->setServerEvents($this->config['server_event'])
             ->setServerType($this->config['server_type'])
             ->setServerParams($this->config['server_params'])
-            ->setAppPath($this->config['app_path'])
             ->setServerSetting($this->config['server_setting']);
     }
 
@@ -118,20 +139,9 @@ class HermesApplication
      * @param string $configFile
      * @return $this
      */
-    public function iniConfig(string $configFile)
+    public function iniConfig()
     {
-        require_once $configFile;
-        $this->config = $config;
-        return $this;
-    }
-
-    /**
-     * @param $appPath
-     * @return $this
-     */
-    public function setAppPath($appPath): self
-    {
-        $this->appPath = $appPath;
+        $this->config = require HERMES_ROOT . 'config.php';
         return $this;
     }
 
@@ -179,7 +189,7 @@ class HermesApplication
     /**
      * @return bool
      */
-    protected function beforeRun()
+    protected function beforeRun(): bool
     {
         return true;
     }

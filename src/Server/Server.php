@@ -10,8 +10,8 @@ namespace Hermes\Server;
 
 
 use Hermes\Server\Contract\ServerInterface;
-use Swoole\Server as CoServer;
 use Swoole\Process;
+use Swoole\Server as CoServer;
 
 /**
  * Class Server
@@ -69,11 +69,6 @@ abstract class Server implements ServerInterface
      * @var array
      */
     protected $setting = [];
-
-    /**
-     * @var string
-     */
-    protected $appPath;
 
     /**
      * The server unique name
@@ -205,7 +200,7 @@ abstract class Server implements ServerInterface
      * @param $mode
      * @param $type
      */
-    public function init($host, $port, $mode, $type)
+    public function init($host, $port, $mode, $type = SWOOLE_SOCK_TCP)
     {
         $this->host = $host;
         $this->port = $port;
@@ -216,11 +211,12 @@ abstract class Server implements ServerInterface
     /**
      * Shutdown server
      */
-    public function shutdown(): void
+    public function stop(): bool
     {
         $pid = $this->getPid();
         Process::kill((int)$pid[0], 15);
         usleep(10000);
+        return true;
     }
 
 
@@ -230,7 +226,7 @@ abstract class Server implements ServerInterface
      */
     public function getPid(): array
     {
-        $pidStr = file_get_contents($this->appPath . '/' . $this->pidFile);
+        $pidStr = file_get_contents(HERMES_ROOT . '/runtime/' . $this->pidFile);
         return explode(',', $pidStr);
     }
 
@@ -242,20 +238,12 @@ abstract class Server implements ServerInterface
      */
     public function setPid($mangerPid, $workerPid): void
     {
-        $filePath = $this->appPath . '/runtime';
+        $filePath = HERMES_ROOT . '/runtime';
         if (!is_dir($filePath)) {
             mkdir($filePath, 0777);
             chmod($filePath, 0777);
         }
-        file_put_contents($this->appPath . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
-    }
-
-    /**
-     * @param $appPath
-     */
-    public function setFilePath(string $appPath): void
-    {
-        $this->appPath = $appPath;
+        file_put_contents($filePath . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
     }
 
 }
