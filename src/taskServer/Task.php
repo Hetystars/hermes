@@ -27,6 +27,11 @@ class Task
     public const ASYNC = 'async';
 
     /**
+     * @var string
+     */
+    public const FD = 'fd';
+
+    /**
      * @var
      */
     private $host;
@@ -70,9 +75,9 @@ class Task
      * @param array $params
      * @return bool|int
      */
-    protected function pushTask(string $fd, array $params)
+    protected function pushTask(array $params)
     {
-        return $this->getInstance()->lpush($fd, json_encode($params));
+        return $this->getInstance()->lpush(static::FD, json_encode($params));
     }
 
 
@@ -83,9 +88,9 @@ class Task
      * @param array $params
      * @return bool|int
      */
-    public function async(string $fd, string $taskEvent, string $method, array $params)
+    public function async(string $taskEvent, string $method, array $params)
     {
-        return $this->pushTask($fd, [$taskEvent, $method, $params]);
+        return $this->pushTask([$taskEvent, $method, $params]);
     }
 
 }

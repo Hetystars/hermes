@@ -59,7 +59,7 @@ class ApplicationProcessor implements ProcessorInterface
             mkdir($filePath, 0777);
             chmod($filePath, 0777);
         }
-        file_put_contents(HERMES_ROOT . '/bin/hermes.php', file_get_contents(HERMES_ROOT . '/vendor/async-task/Hermes/bin/hermes.php'));
+        file_put_contents(HERMES_ROOT . '/bin/hermes', file_get_contents(HERMES_ROOT . '/vendor/async-task/Hermes/bin/hermes.php'));
         $configStr = <<<STR
 <?php
 return [
@@ -74,7 +74,11 @@ return [
             'response_file' => '/tmp/response.log'
        ],//swoole 设置
        'server_event' => ['prometheus\util\AjaxHandler'],//需要异步调用的任务，需异步调用的任务需继承Hermes\TaskServer\Contract\TaskEvent,并重写类常量const EVENT_NAME(taskEvent名称，必写),EVENT_CALLBACK_METHOD_MAP(异步任务回调设置，可不写)
-       'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE],//swoole服务器配置,host,port,模式
+       'server_params' => [
+           'host'=>'127.0.0.1', 
+           'port'=>9501, 
+           'type'=>SWOOLE_BASE
+       ],//swoole服务器配置
    ];
 STR;
         file_put_contents(HERMES_ROOT . '/config.php', $configStr);

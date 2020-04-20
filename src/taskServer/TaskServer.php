@@ -30,7 +30,9 @@ class TaskServer extends Server
     /**
      * @var string
      */
-    public const PROCESS_TITLE = 'hermes process';
+    public const
+        TASK_PROCESS_TITLE = 'hermes task process',
+        MANAGER_PROCESS_TITLE = 'hermes manager process';
 
 
     /**
@@ -41,8 +43,7 @@ class TaskServer extends Server
     public function start(): void
     {
         $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode);
-        $this->setServerConst()
-            ->startSwoole();
+        $this->startSwoole();
     }
 
     /**
@@ -64,25 +65,19 @@ class TaskServer extends Server
         });
 
         $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
-            //@TODO 待优化，每次回调都更新pid文件效率过低
-            $this->setPid($server->manager_pid, $server->worker_pid);
             //处理任务
             $params = json_decode($data[1], true);
             $response = $this->handleTask($params[0], $params[1], $params[2]);
             return [$params[0], $params[1], $response];
         });
-        SystemHelper::setProcessTitle(static::PROCESS_TITLE);
-        $this->swooleServer->start();
-    }
 
-    /**
-     * @return $this
-     */
-    protected function setServerConst(): self
-    {
-        defined('TASK_SERVER_HOST') or define('l', $this->host);
-        defined('TASK_SERVER_PORT') or define('TASK_SERVER_PORT', $this->port);
-        return $this;
+        SystemHelper::setProcessTitle(static::TASK_PROCESS_TITLE);
+
+        $this->swooleServer->on('managerStart', function ($server) {
+            $this->setPid($server->manager_pid, $server->worker_pid);
+            SystemHelper::setProcessTitle(static::MANAGER_PROCESS_TITLE);
+        });
+        $this->swooleServer->start();
     }
 
     /**

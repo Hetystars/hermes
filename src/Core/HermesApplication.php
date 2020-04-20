@@ -23,8 +23,7 @@ class HermesApplication
      *  'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,
      *  'server_setting' => [],
      *  'server_event' => ['prometheus\util\AjaxHandler'],
-     *  'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE, SWOOLE_SOCK_TCP],
-     *  'app_path' => '/var/http/www/as-project/'
+     *  'server_params' => ['127.0.0.1', 9501, SWOOLE_BASE, SWOOLE_SOCK_TCP]
      * ]
      * @var
      */
@@ -130,7 +129,7 @@ class HermesApplication
     {
         return $this->setServerEvents($this->config['server_event'])
             ->setServerType($this->config['server_type'])
-            ->setServerParams($this->config['server_params'])
+            ->setServerParams(array_values($this->config['server_params']))
             ->setServerSetting($this->config['server_setting']);
     }
 
