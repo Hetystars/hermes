@@ -27,10 +27,30 @@ class Task
     public const ASYNC = 'async';
 
     /**
+     * @var
+     */
+    private $host;
+
+    /**
+     * @var
+     */
+    private $port;
+
+    /**
      * @var Redis
      */
     private static $instance;
 
+    /**
+     * Task constructor.
+     * @param $host
+     * @param $port
+     */
+    public function __construct($host, $port)
+    {
+        $this->host = $host;
+        $this->port = $port;
+    }
 
     /**
      * @return Redis
@@ -39,7 +59,7 @@ class Task
     {
         if (empty(static::$instance)) {
             $redis = new Redis;
-            $redis->connect(TASK_SERVER_HOST, TASK_SERVER_PORT);
+            $redis->connect($this->host, $this->port);
             static::$instance = $redis;
         }
         return static::$instance;

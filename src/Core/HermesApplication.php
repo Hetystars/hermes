@@ -38,22 +38,22 @@ class HermesApplication
     /**
      * @var int
      */
-    protected $serverType;
+    protected $serverType = HermesApplication::TASK_SERVER;
 
     /**
      * @var array
      */
-    protected $serverParams;
+    protected $serverParams = [];
 
     /**
      * @var array
      */
-    protected $serverEvents;
+    protected $serverEvents = [];
 
     /**
      * @var array
      */
-    protected $setting;
+    protected $setting = [];
 
 
     /**

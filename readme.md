@@ -2,7 +2,15 @@
 
 #### 使用说明
 
-1.添加配置文件
+
+## Quick Start
+```
+composer require easyswoole/easyswoole=3.x
+php vendor/bin/hermes.php install
+php bin/hermes.php start
+```
+
+## 配置说明
 
 ```
 // /config.php
@@ -16,17 +24,17 @@
 ```
 
   
-2.启动swoole 服务
+## command
 ```
-$configFilePath = dirname(__DIR__).'/config.php';//配置文件路径
-$swoole = new \Hermes\Core\HermesApplication();
-$swoole->iniConfig($configFilePath)
-    ->run();
+php bin/hermes.php start  启动
+php bin/hermes.php stop   停止
+php bin/hermes.php restart  重启
+
 ```  
     
-3.同步代码中开启异步任务
+## 同步代码中开启异步任务
 ```
-$task = new \Hermes\TaskServer\Task('127.0.0.1', 9501);//swoole服务器配置,host,port,模式，配置文件中server_params ,host,port
+$task = new \Hermes\TaskServer\Task();
 $taskEvent = 'test';//taskEvent 名称,即类常量EVENT_NAME的值
 $taskMethod = 'test';//taskEvent 方法名称
 $params = []; //方法参数

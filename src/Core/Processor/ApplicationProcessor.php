@@ -78,7 +78,7 @@ return [
    ];
 STR;
         file_put_contents(HERMES_ROOT . '/config.php', $configStr);
-        echo 'install success' . PHP_EOL . 'please run php bin/hermes start';
+        echo 'install success', PHP_EOL, 'please run php bin/hermes start', PHP_EOL;
         return true;
     }
 

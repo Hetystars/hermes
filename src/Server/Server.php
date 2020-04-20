@@ -226,7 +226,7 @@ abstract class Server implements ServerInterface
      */
     public function getPid(): array
     {
-        $pidStr = file_get_contents(HERMES_ROOT . '/runtime/' . $this->pidFile);
+        $pidStr = file_get_contents(HERMES_ROOT . '/' . $this->pidFile);
         return explode(',', $pidStr);
     }
 
@@ -243,7 +243,7 @@ abstract class Server implements ServerInterface
             mkdir($filePath, 0777);
             chmod($filePath, 0777);
         }
-        file_put_contents($filePath . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
+        file_put_contents(HERMES_ROOT . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
     }
 
 }
