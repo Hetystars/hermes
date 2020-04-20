@@ -5,7 +5,7 @@
 
 ## Quick Start
 ```
-composer require easyswoole/easyswoole=3.x
+composer require async-task/hermes
 php vendor/bin/hermes.php install
 php bin/hermes.php start
 ```

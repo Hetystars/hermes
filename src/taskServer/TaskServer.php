@@ -11,6 +11,7 @@ namespace Hermes\TaskServer;
 
 use Hermes\{
     Core\Helper\PhpHelper,
+    Core\Helper\SystemHelper,
     Server\Exception\ServerException,
     Server\Server,
     TaskServer\Event\TaskEventTrait,
@@ -25,6 +26,11 @@ use Swoole\Redis\Server as RedisServer;
 class TaskServer extends Server
 {
     use TaskEventTrait;
+
+    /**
+     * @var string
+     */
+    public const PROCESS_TITLE = 'hermes process';
 
 
     /**
@@ -65,6 +71,7 @@ class TaskServer extends Server
             $response = $this->handleTask($params[0], $params[1], $params[2]);
             return [$params[0], $params[1], $response];
         });
+        SystemHelper::setProcessTitle(static::PROCESS_TITLE);
         $this->swooleServer->start();
     }
 
@@ -73,7 +80,7 @@ class TaskServer extends Server
      */
     protected function setServerConst(): self
     {
-        defined('TASK_SERVER_HOST') or define('TASK_SERVER_HOST', $this->host);
+        defined('TASK_SERVER_HOST') or define('l', $this->host);
         defined('TASK_SERVER_PORT') or define('TASK_SERVER_PORT', $this->port);
         return $this;
     }
