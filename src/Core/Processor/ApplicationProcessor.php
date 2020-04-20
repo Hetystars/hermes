@@ -54,7 +54,12 @@ class ApplicationProcessor implements ProcessorInterface
      */
     protected function install(): bool
     {
-        file_put_contents(HERMES_ROOT . '/bin/hermes.php', file_get_contents(HERMES_ROOT . '/vendor/Hermes/bin/hermes.php'));
+        $filePath = HERMES_ROOT . '/bin';
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777);
+            chmod($filePath, 0777);
+        }
+        file_put_contents(HERMES_ROOT . '/bin/hermes.php', file_get_contents(HERMES_ROOT . '/vendor/async-task/Hermes/bin/hermes.php'));
         $configStr = <<<STR
 <?php
 return [

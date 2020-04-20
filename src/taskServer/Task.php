@@ -17,16 +17,6 @@ use Redis;
 class Task
 {
     /**
-     * @var string
-     */
-    private $host;
-
-    /**
-     * @var int
-     */
-    private $port;
-
-    /**
      * Coroutine
      */
     public const CO = 'co';
@@ -41,17 +31,6 @@ class Task
      */
     private static $instance;
 
-    /**
-     * Task constructor.
-     * @param string $host
-     * @param int $port
-     */
-    public function __construct(string $host, int $port)
-    {
-        $this->host = $host;
-        $this->port = $port;
-    }
-
 
     /**
      * @return Redis
@@ -60,7 +39,7 @@ class Task
     {
         if (empty(static::$instance)) {
             $redis = new Redis;
-            $redis->connect($this->host, $this->port);
+            $redis->connect(TASK_SERVER_HOST, TASK_SERVER_PORT);
             static::$instance = $redis;
         }
         return static::$instance;

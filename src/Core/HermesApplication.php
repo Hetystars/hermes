@@ -110,12 +110,11 @@ class HermesApplication
             return;
         }
         try {
-            if (!$this->beforeRun()) {
-                return;
+            if ($command !== static::COMMAND_INSTALL) {
+                $this->iniConfig()
+                    ->iniServer();
             }
-            $this->iniConfig()
-                ->iniServer()
-                ->getProcessor()
+            $this->getProcessor()
                 ->handle($command, $this->serverType, $this->serverParams, $this->serverEvents, $this->setting);
         } catch (Throwable $e) {
             echo $e->getMessage(), PHP_EOL,
@@ -127,7 +126,7 @@ class HermesApplication
     /**
      * @return HermesApplication
      */
-    private function iniServer()
+    private function iniServer(): HermesApplication
     {
         return $this->setServerEvents($this->config['server_event'])
             ->setServerType($this->config['server_type'])
@@ -136,12 +135,11 @@ class HermesApplication
     }
 
     /**
-     * @param string $configFile
      * @return $this
      */
-    public function iniConfig()
+    public function iniConfig(): self
     {
-        $this->config = require HERMES_ROOT . 'config.php';
+        $this->config = require HERMES_ROOT . '/config.php';
         return $this;
     }
 

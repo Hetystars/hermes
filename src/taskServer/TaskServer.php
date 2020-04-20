@@ -35,7 +35,8 @@ class TaskServer extends Server
     public function start(): void
     {
         $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode);
-        $this->startSwoole();
+        $this->setServerConst()
+            ->startSwoole();
     }
 
     /**
@@ -65,6 +66,16 @@ class TaskServer extends Server
             return [$params[0], $params[1], $response];
         });
         $this->swooleServer->start();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function setServerConst(): self
+    {
+        defined('TASK_SERVER_HOST') or define('TASK_SERVER_HOST', $this->host);
+        defined('TASK_SERVER_PORT') or define('TASK_SERVER_PORT', $this->port);
+        return $this;
     }
 
     /**
