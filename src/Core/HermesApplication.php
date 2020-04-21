@@ -138,7 +138,7 @@ class HermesApplication
      */
     public function iniConfig(): self
     {
-        $this->config = require HERMES_ROOT . '/config.php';
+        $this->config = require HERMES_ROOT . '/hermes_config.php';
         return $this;
     }
 
