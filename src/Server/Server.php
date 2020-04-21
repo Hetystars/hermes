@@ -200,7 +200,7 @@ abstract class Server implements ServerInterface
      * @param $mode
      * @param $type
      */
-    public function init($host, $port, $mode, $type = SWOOLE_SOCK_TCP)
+    public function init($host, $port, $mode = SWOOLE_BASE, $type = SWOOLE_SOCK_TCP)
     {
         $this->host = $host;
         $this->port = $port;
