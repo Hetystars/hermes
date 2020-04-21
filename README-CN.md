@@ -1,6 +1,6 @@
 English | [中文](./README-CN.md)
 
-### Async Task In FPM
+### FPM中调用异步任务
 
 [![Php Version](https://img.shields.io/badge/php-%3E=7.1-brightgreen.svg?maxAge=2592000)](https://secure.php.net/)
 [![Swoole Version](https://img.shields.io/badge/swoole-%3E=4.4.1-brightgreen.svg?maxAge=2592000)](https://github.com/swoole/swoole-src)
@@ -8,26 +8,26 @@ English | [中文](./README-CN.md)
 
 
 
-### Instructions
+### 说明
 
 
-### Requirement
+### 依赖
 
 - [PHP 7.1+](https://github.com/php/php-src/releases)
 - [Swoole 4.4.1+](https://github.com/swoole/swoole-src/releases)
 - [Redis 3.2.0+](https://pecl.php.net/package/redis)
 - [Composer](https://getcomposer.org/)
 
-### Quick Start
+### 快速开始
 ```
 composer require async-task/hermes
 php vendor/bin/hermes install
 php bin/hermes start
 ```
 
-### Configuration Instruction
+### 配置文件说明
 
-#### Configuration File
+#### 配置文件
 ```
 APP_PATH/hermes_config.php
   [
@@ -49,35 +49,35 @@ APP_PATH/hermes_config.php
             ],
   ];
 ```
-#### Configuration Params Detail
+#### 配置参数细节
 
-> server_type: `swoole server type，only support task sever`
+> server_type: `swoole server 类型，仅支持 task sever`
 
 + \Hermes\Core\HermesApplication::TASK_SERVER
 
-> server_setting: `swoole setting`
+> server_setting: `swoole 设置`
 
 + task_worker_num,task worker num
 + worker_num, worker num
 + log_file, swoole log 
 + log_level, swoole log level
-+ daemonize, daemon or not
++ daemonize, 是否守护进程
 + response_file, response log
 
-> server_event: `async task event map，need to extend Hermes\TaskServer\Contract\TaskEvent,and rewrite class const EVENT_NAME(taskEvent name，required),EVENT_CALLBACK_METHOD_MAP(async task callback,non-required)`
+> server_event: `异步任务事件，需要继承实现Hermes\TaskServer\Contract\TaskEvent,且重写类常量  EVENT_NAME(taskEvent name，必需),EVENT_CALLBACK_METHOD_MAP(异步任务回调，非必需)`
 
 + class map
   
-> server_params: `swoole swoole server setting。depend on redis extension，only use the redis socket connect，notice the redis server is not a real redis server`
+> server_params: `swoole swoole server 设置。依赖 redis 扩展，仅利用redis socket连接，注意这不是一个真正的Redis服务器`
   
   + host,server host
   + port, server port
   
 ### Command
 ```
-php bin/hermes start  start the server
-php bin/hermes stop   stop the server
-php bin/hermes restart  restart the server
+php bin/hermes start  开启服务
+php bin/hermes stop   停止服务
+php bin/hermes restart  重启服务
 
 ```  
     
@@ -85,8 +85,8 @@ php bin/hermes restart  restart the server
 ```
 $config = [];
 $task = new \Hermes\TaskServer\Task($config['server_params']['host'],$config['server_params']['port']);
-$taskEvent = 'testEvent';//taskEvent name,that's the value of EVENT_NAME
-$taskMethod = 'test';//taskEvent function name
-$params = []; //taskEvent function params
+$taskEvent = 'testEvent';//taskEvent 名称,EVENT_NAME的值
+$taskMethod = 'test';//taskEvent 方法名称
+$params = []; //taskEvent 方法参数
 $task->async($taskEvent, $taskMethod, $params);
 ```

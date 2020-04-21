@@ -185,7 +185,7 @@ abstract class Server implements ServerInterface
     /**
      * @var string
      */
-    public const RESPONSE_LOG = '/tmp/response.log';
+    public const RESPONSE_LOG = '/tmp/log/response.log';
 
     /**
      *

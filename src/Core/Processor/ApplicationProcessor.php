@@ -59,11 +59,11 @@ class ApplicationProcessor implements ProcessorInterface
             mkdir($filePath, 0777);
             chmod($filePath, 0777);
         }
-        file_put_contents(HERMES_ROOT . '/bin/hermes', file_get_contents(HERMES_ROOT . '/vendor/async-task/Hermes/bin/hermes.php'));
+        file_put_contents(HERMES_ROOT . '/bin/hermes', file_get_contents(HERMES_ROOT . '/vendor/async-task/Hermes/bin/hermes'));
         $configStr = <<<STR
 <?php
 return [
-       'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,//swoole server 类型，目前仅支持TASK_SERVER类型
+       'server_type' => \Hermes\Core\HermesApplication::TASK_SERVER,
        'server_setting' => [
             'task_worker_num' => 4,
             'worker_num' => 1,
@@ -72,16 +72,18 @@ return [
             'daemonize' => 1,
             'enable_coroutine' => false,
             'response_file' => '/tmp/response.log'
-       ],//swoole 设置
-       'server_event' => ['prometheus\util\AjaxHandler'],//需要异步调用的任务，需异步调用的任务需继承Hermes\TaskServer\Contract\TaskEvent,并重写类常量const EVENT_NAME(taskEvent名称，必写),EVENT_CALLBACK_METHOD_MAP(异步任务回调设置，可不写)
+       ],
+       'server_event' => [
+            
+            ],
        'server_params' => [
            'host'=>'127.0.0.1', 
            'port'=>9501, 
            'type'=>SWOOLE_BASE
-       ],//swoole服务器配置
+       ],
    ];
 STR;
-        file_put_contents(HERMES_ROOT . '/config.php', $configStr);
+        file_put_contents(HERMES_ROOT . '/hermes_config.php', $configStr);
         echo 'install success', PHP_EOL, 'please run php bin/hermes start', PHP_EOL;
         return true;
     }

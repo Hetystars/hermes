@@ -1,4 +1,5 @@
-<?php
+#!/usr/bin/env php
+<?php declare(strict_types=1);
 
 defined('IN_PHAR') or define('IN_PHAR', (bool)\Phar::running(false));
 defined('RUNNING_ROOT') or define('RUNNING_ROOT', realpath(getcwd()));
