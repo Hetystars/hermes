@@ -78,8 +78,7 @@ return [
             ],
        'server_params' => [
            'host'=>'127.0.0.1', 
-           'port'=>9501, 
-           'type'=>SWOOLE_BASE
+           'port'=>9501
        ],
    ];
 STR;

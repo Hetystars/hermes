@@ -231,7 +231,7 @@ class PhpHelper
             if (empty($key) || is_int($key)) {
                 $key = '';
             }
-            echo sprintf('%s %s %s %s', "\e", $key, is_scalar($item) ? $item : json_encode($item), PHP_EOL);
+            echo sprintf('%s %s %s', $key, is_scalar($item) ? $item : json_encode($item), PHP_EOL);
         });
     }
 

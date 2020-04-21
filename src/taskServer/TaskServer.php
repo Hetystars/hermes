@@ -187,11 +187,11 @@ class TaskServer extends Server
         return [
             'task_worker_num' => 4,
             'worker_num' => 1,
-            'log_file' => '/tmp/swoole.log',
+            'log_file' => '/tmp/log/swoole.log',
             'log_level' => SWOOLE_LOG_NOTICE,
             'daemonize' => 1,
             'enable_coroutine' => false,
-            'response_file' => '/tmp/response.log'
+            'response_file' => '/tmp/log/response.log'
         ];
     }
 
@@ -240,15 +240,15 @@ class TaskServer extends Server
     /**
      * @return $this
      */
-    private function printMsg()
+    private function printMsg(): self
     {
         PhpHelper::printOut(array_merge([Hermes::HERMES_SLOAN], [
             'php' => phpversion(),
             'swoole' => phpversion('swoole'),
-            'task server' => "\033[31m" . $this->host . ':' . $this->port . " \033[0m\n\"",
+            'task server' => "\033[31m" . $this->host . ':' . $this->port . " \033[0m",
             'task num' => $this->setting['task_worker_num'],
             'swoole_log' => $this->setting['log_file'],
-            'response_log' => $this->setting['response_log'],
+            'response_log' => $this->setting['response_file'],
         ]));
         return $this;
     }
