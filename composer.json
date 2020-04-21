@@ -13,6 +13,7 @@
     "ext-pdo": "*",
     "ext-redis": "*",
     "ext-json": "*",
+    "ext-swoole": ">4.4",
     "swoole/ide-helper": "*"
   },
   "autoload": {

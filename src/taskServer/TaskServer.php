@@ -167,6 +167,7 @@ class TaskServer extends Server
     {
         $setting = array_merge($this->getDefaultSetting(), $setting);
         $setting['log_file'] = PhpHelper::formatLogFileWithDate($setting['log_file']);
+        $setting['response_file'] = PhpHelper::formatLogFileWithDate($setting['response_file']);
         $this->setting = array_merge($this->getDefaultSetting(), $setting);
     }
 
@@ -241,7 +242,14 @@ class TaskServer extends Server
      */
     private function printMsg()
     {
-        PhpHelper::printOut([Hermes::HERMES_SLOAN, Hermes::startMsg(['port' => $this->port, 'host' => $this->host])]);
+        PhpHelper::printOut(array_merge([Hermes::HERMES_SLOAN], [
+            'php' => phpversion(),
+            'swoole' => phpversion('swoole'),
+            'task server' => "\033[31m" . $this->host . ':' . $this->port . " \033[0m\n\"",
+            'task num' => $this->setting['task_worker_num'],
+            'swoole_log' => $this->setting['log_file'],
+            'response_log' => $this->setting['response_log'],
+        ]));
         return $this;
     }
 }
