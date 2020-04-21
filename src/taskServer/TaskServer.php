@@ -12,6 +12,7 @@ namespace Hermes\TaskServer;
 use Hermes\{
     Core\Helper\PhpHelper,
     Core\Helper\SystemHelper,
+    Core\Hermes,
     Server\Exception\ServerException,
     Server\Server,
     TaskServer\Event\TaskEventTrait,
@@ -42,8 +43,9 @@ class TaskServer extends Server
      */
     public function start(): void
     {
-        $this->swooleServer = new RedisServer($this->host, $this->port, $this->mode);
-        $this->startSwoole();
+        $this->swooleServer = new RedisServer($this->host, $this->port, SWOOLE_BASE);
+        $this->printMsg()
+            ->startSwoole();
     }
 
     /**
@@ -123,8 +125,7 @@ class TaskServer extends Server
                 }
             }
         }
-        $file = $this->setting['response_log'] ?? static::RESPONSE_LOG;
-        file_put_contents($this->setting['response_log'] ?? static::RESPONSE_LOG, date('Y-m-d H:i:s') . json_encode(['task_event' => $taskEvent, 'task_method' => $taskMethod, 'response' => $response]) . PHP_EOL, FILE_APPEND);
+        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . json_encode(['task_event' => $taskEvent, 'task_method' => $taskMethod, 'response' => $response]) . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -164,6 +165,8 @@ class TaskServer extends Server
      */
     public function setting($setting): void
     {
+        $setting = array_merge($this->getDefaultSetting(), $setting);
+        $setting['log_file'] = PhpHelper::formatLogFileWithDate($setting['log_file']);
         $this->setting = array_merge($this->getDefaultSetting(), $setting);
     }
 
@@ -231,5 +234,14 @@ class TaskServer extends Server
     {
         $this->stop();
         $this->start();
+    }
+
+    /**
+     * @return $this
+     */
+    private function printMsg()
+    {
+        PhpHelper::printOut([Hermes::HERMES_SLOAN, Hermes::startMsg(['port' => $this->port, 'host' => $this->host])]);
+        return $this;
     }
 }

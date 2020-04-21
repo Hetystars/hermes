@@ -53,7 +53,7 @@ abstract class Server implements ServerInterface
      *
      * @var int
      */
-    protected $mode = SWOOLE_PROCESS;
+    protected $mode = SWOOLE_BASE;
 
     /**
      * Default socket type
@@ -215,7 +215,7 @@ abstract class Server implements ServerInterface
     {
         $pid = $this->getPid();
         Process::kill((int)$pid[0], 15);
-        usleep(10000);
+        usleep(100000);
         return true;
     }
 

@@ -221,4 +221,26 @@ class PhpHelper
             $parentRef ? self::getClassNames($parentRef->getName()) : []
         ));
     }
+
+    /**
+     * @param $data
+     */
+    public static function printOut(array $data): void
+    {
+        array_walk($data, function ($item, $key) {
+            echo sprintf('%s %s %s', $key, is_scalar($item) ? $item : json_encode($item), PHP_EOL);
+        });
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    public static function formatLogFileWithDate(string $file): string
+    {
+        $fileArray = explode('/', $file);
+        $fileName = date('Y-m-d') . '_' . array_pop($fileArray);
+        $fileArray[] = $fileName;
+        return implode('/', $fileArray);
+    }
 }
