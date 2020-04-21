@@ -21,7 +21,7 @@ English | [中文](./README-CN.md)
 ### Quick Start
 ```
 composer require async-task/hermes
-php vendor/bin/hermes install
+php vendor/async-task/Hermes/bin/hermes.php install
 php bin/hermes start
 ```
 
