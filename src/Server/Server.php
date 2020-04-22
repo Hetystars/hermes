@@ -228,7 +228,11 @@ abstract class Server implements ServerInterface
      */
     public function getPid(): array
     {
-        $pidStr = file_get_contents(HERMES_ROOT . '/' . $this->pidFile);
+        $file = HERMES_ROOT . '/' . $this->pidFile;
+        if (!file_exists($file)) {
+            return [0, 0];
+        }
+        $pidStr = file_get_contents($file);
         return explode(',', $pidStr);
     }
 
