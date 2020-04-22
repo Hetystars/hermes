@@ -4,6 +4,8 @@ namespace Hermes\Core\Processor;
 
 
 use Hermes\{
+    Core\Helper\PhpHelper,
+    Core\Hermes,
     Core\HermesApplication,
     Server\Event\EventManger,
     Server\Server,
@@ -67,11 +69,11 @@ return [
        'server_setting' => [
             'task_worker_num' => 4,
             'worker_num' => 1,
-            'log_file' => '/tmp/swoole.log',
+            'log_file' => '/tmp/log/swoole.log',
             'log_level' => SWOOLE_LOG_NOTICE,
             'daemonize' => 1,
             'enable_coroutine' => false,
-            'response_file' => '/tmp/response.log'
+            'response_file' => '/tmp/log/response.log'
        ],
        'server_event' => [
             
@@ -83,7 +85,7 @@ return [
    ];
 STR;
         file_put_contents(HERMES_ROOT . '/hermes_config.php', $configStr);
-        echo 'install success', PHP_EOL, 'please run php bin/hermes start', PHP_EOL;
+        PhpHelper::printOut([Hermes::HERMES_SLOAN, 'install success', 'please run php bin/hermes start']);
         return true;
     }
 

@@ -215,8 +215,9 @@ abstract class Server implements ServerInterface
     public function stop(): bool
     {
         $pid = $this->getPid();
-        Process::kill((int)$pid[0], 15);
-        usleep(100000);
+        $managerPid = (int)$pid[0];
+        $this->killAndWait($managerPid);
+        PhpHelper::printOut(['stop success']);
         return true;
     }
 
@@ -257,6 +258,113 @@ abstract class Server implements ServerInterface
     protected function getUniqId($taskId): string
     {
         return sprintf('%s%d', PhpHelper::uniqID('', true), $taskId);
+    }
+
+    /**
+     * Do shutdown process and wait it exit.
+     *
+     * @param int $pid Process Pid
+     * @param int $signal SIGTERM = 15
+     * @param string $name
+     * @param int $waitTime Seconds
+     *
+     * @return bool
+     */
+    protected function killAndWait(int $pid, int $signal = 15, string $name = 'manager process', int $waitTime = 5): bool
+    {
+        if (!$this->isRunning($pid)) {
+            return true;
+        }
+
+        // Do stop
+        if (!$this->sendSignal($pid, $signal)) {
+            return false;
+        }
+
+        // not wait, only send signal
+        if ($waitTime <= 0) {
+            return true;
+        }
+
+        $errorMsg = '';
+        $startTime = time();
+
+        // wait exit
+        while (true) {
+            if (!$this->isRunning($pid)) {
+                break;
+            }
+            if (time() - $startTime > $waitTime) {
+                $errorMsg = "Stop the $name(PID:$pid) failed(timeout:{$waitTime}s)!";
+                break;
+            }
+            sleep(1);
+        }
+
+        if ($errorMsg) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Send signal to the server process
+     *
+     * @param int $pid
+     * @param int $signal
+     * @param int $timeout
+     *
+     * @return bool
+     */
+    public function sendSignal(int $pid, int $signal, int $timeout = 0): bool
+    {
+        if ($pid <= 0) {
+            return false;
+        }
+
+        // do send
+        if ($ret = Process::kill($pid, $signal)) {
+            return true;
+        }
+
+        // don't want retry
+        if ($timeout <= 0) {
+            return $ret;
+        }
+
+        // failed, try again ...
+        $timeout = $timeout > 0 && $timeout < 10 ? $timeout : 3;
+        $startTime = time();
+
+        // retry stop if not stopped.
+        while (true) {
+            // success
+            if (!$isRunning = Process::kill($pid, 0)) {
+                break;
+            }
+
+            // have been timeout
+            if ((time() - $startTime) >= $timeout) {
+                return false;
+            }
+
+            // try again kill
+            $ret = Process::kill($pid, $signal);
+            usleep(10000);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * @param int $pid
+     *
+     * @return bool
+     */
+    public function isRunning(int $pid): bool
+    {
+        return ($pid > 0) && Process::kill($pid, 0);
     }
 
 }

@@ -43,9 +43,11 @@ class TaskServer extends Server
      */
     public function start(): void
     {
-        $this->swooleServer = new RedisServer($this->host, $this->port, SWOOLE_BASE);
-        $this->printMsg()
-            ->startSwoole();
+        if ($this->checkServerRunningStatus()) {
+            $this->swooleServer = new RedisServer($this->host, $this->port, SWOOLE_BASE);
+            $this->printMsg()
+                ->startSwoole();
+        }
     }
 
     /**
@@ -270,6 +272,20 @@ class TaskServer extends Server
             'response_log' => $this->setting['response_file'],
         ]));
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    private function checkServerRunningStatus(): bool
+    {
+        $pid = $this->getPid();
+        $managerPid = (int)$pid[0];
+        if ($this->isRunning($managerPid)) {
+            PhpHelper::printOut(["\033[31m" . 'task server is already running' . " \033[0m"]);
+            return false;
+        }
+        return true;
     }
 
     /**
