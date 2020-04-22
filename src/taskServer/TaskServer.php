@@ -58,15 +58,16 @@ class TaskServer extends Server
             $taskId = $this->swooleServer->task($data);
             if ($taskId === false) {
                 $taskId = RedisServer::format(RedisServer::ERROR);
+            } else {
+                $taskId = RedisServer::format(RedisServer::INT, $taskId);
             }
-            $taskId = $this->getUniqId(RedisServer::format(RedisServer::INT, $taskId));
             $params = json_decode($data[1], true);
-            $this->recoredTaskLog($taskId, $params[0], $params[1], false);
-            return $taskId;
+            $this->recoredTaskLog((string)$taskId, $params[0], $params[1], false);
+            return (string)$taskId;
         });
 
         $this->swooleServer->on('Finish', function ($server, $taskId, $response) {
-            $this->taskResponse($taskId, $response[0], $response[1], $response[2]);
+            $this->taskResponse((string)$taskId, $response[0], $response[1], $response[2]);
         });
 
         $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
@@ -130,7 +131,7 @@ class TaskServer extends Server
                 }
             }
         }
-
+        return true;
     }
 
     /**
@@ -142,7 +143,7 @@ class TaskServer extends Server
     protected function recoredTaskLog(string $taskId, string $taskEvent, string $taskMethod, $isHandleDone = false)
     {
         $handMsg = $isHandleDone ? ' handle done' : ' start handle';
-        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . $handMsg . '  task_id:' . $taskId . ' task_event: ' . $taskEvent . ' task_method: ' . $taskMethod . PHP_EOL, FILE_APPEND);
+        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . $handMsg . '  task_id:' . (int)$taskId . ' task_event: ' . $taskEvent . ' task_method: ' . $taskMethod . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -269,5 +270,19 @@ class TaskServer extends Server
             'response_log' => $this->setting['response_file'],
         ]));
         return $this;
+    }
+
+    /**
+     * Get task global unique id
+     *
+     * @param int $taskId
+     *
+     * @return string
+     */
+    protected function getUniqId($taskId): string
+    {
+        $str = uniqid((string)$taskId, true);
+        $strArray = explode('.', $str);
+        return $strArray[0] ?? (string)$taskId;
     }
 }
