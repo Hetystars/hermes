@@ -1,4 +1,4 @@
-English | [中文](./README-CN.md)
+中文 | [English](./README.md)
 
 ### FPM中调用异步任务
 

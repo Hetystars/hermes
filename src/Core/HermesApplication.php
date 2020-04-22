@@ -8,6 +8,7 @@
 
 namespace Hermes\Core;
 
+use Hermes\Core\Helper\PhpHelper;
 use Hermes\Core\Processor\ApplicationProcessor;
 use Hermes\TaskServer\TaskServer;
 use Throwable;
@@ -105,7 +106,7 @@ class HermesApplication
     {
         $command = $params[0];
         if (!in_array($command, static::COMMAND_MAP, false)) {
-            echo 'unsupported command ' . $command;
+            PhpHelper::printOut(["\033[31m" . 'unsupported command ' . $command . " \033[0m"]);
             return;
         }
         try {
@@ -116,10 +117,8 @@ class HermesApplication
             $this->getProcessor()
                 ->handle($command, $this->serverType, $this->serverParams, $this->serverEvents, $this->setting);
         } catch (Throwable $e) {
-            echo $e->getMessage(), PHP_EOL,
-            $e->getTraceAsString(), PHP_EOL;
+            PhpHelper::printOut(["\033[31m" . $e->getMessage() . " \033[0m", $e->getTraceAsString()]);
         }
-        echo 'server start success';
     }
 
     /**
