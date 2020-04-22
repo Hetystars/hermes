@@ -83,10 +83,8 @@ php bin/hermes restart  restart the server
     
 ### Start Async Task
 ```
-$config = [];
-$task = new \Hermes\TaskServer\Task($config['server_params']['host'],$config['server_params']['port']);
 $taskEvent = 'testEvent';//taskEvent name,that's the value of EVENT_NAME
 $taskMethod = 'test';//taskEvent function name
 $params = []; //taskEvent function params
-$task->async($taskEvent, $taskMethod, $params);
+Hermes\TaskServer\Task::async($taskEvent, $taskMethod, $params);
 ```

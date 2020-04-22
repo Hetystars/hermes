@@ -83,10 +83,8 @@ php bin/hermes restart  重启服务
     
 ### Start Async Task
 ```
-$config = [];
-$task = new \Hermes\TaskServer\Task($config['server_params']['host'],$config['server_params']['port']);
 $taskEvent = 'testEvent';//taskEvent 名称,EVENT_NAME的值
 $taskMethod = 'test';//taskEvent 方法名称
 $params = []; //taskEvent 方法参数
-$task->async($taskEvent, $taskMethod, $params);
+Hermes\TaskServer\Task::async($taskEvent, $taskMethod, $params);
 ```
