@@ -57,13 +57,16 @@ class TaskServer extends Server
         $this->swooleServer->setHandler('LPUSH', function ($fd, $data) {
             $taskId = $this->swooleServer->task($data);
             if ($taskId === false) {
-                return RedisServer::format(RedisServer::ERROR);
+                $taskId = RedisServer::format(RedisServer::ERROR);
             }
-            return RedisServer::format(RedisServer::INT, $taskId);
+            $taskId = $this->getUniqId(RedisServer::format(RedisServer::INT, $taskId));
+            $params = json_decode($data[1], true);
+            $this->recoredTaskLog($taskId, $params[0], $params[1], false);
+            return $taskId;
         });
 
         $this->swooleServer->on('Finish', function ($server, $taskId, $response) {
-            $this->taskResponse(...$response);
+            $this->taskResponse($taskId, $response[0], $response[1], $response[2]);
         });
 
         $this->swooleServer->on('Task', function ($server, $taskId, $workerId, $data) {
@@ -103,17 +106,19 @@ class TaskServer extends Server
 
 
     /**
+     * @param string $taskId
      * @param string $taskEvent
      * @param string $taskMethod
      * @param array $response
      * @return mixed
      * @throws TaskException
      */
-    protected function taskResponse(string $taskEvent, string $taskMethod, $response)
+    protected function taskResponse(string $taskId, string $taskEvent, string $taskMethod, $response)
     {
         if (!isset(static::$eventMap[$taskEvent])) {
             throw new TaskException();
         }
+        $this->recoredTaskLog($taskId, $taskEvent, $taskMethod, true);
         $taskEventObj = static::$eventMap[$taskEvent];
         $taskEventCallbackMethodMap = $taskEventObj::EVENT_CALLBACK_METHOD_MAP;
         if (!empty($taskEventCallbackMethodMap)) {
@@ -125,7 +130,19 @@ class TaskServer extends Server
                 }
             }
         }
-        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . json_encode(['task_event' => $taskEvent, 'task_method' => $taskMethod, 'response' => $response]) . PHP_EOL, FILE_APPEND);
+
+    }
+
+    /**
+     * @param string $taskId
+     * @param string $taskEvent
+     * @param string $taskMethod
+     * @param bool $isHandleDone
+     */
+    protected function recoredTaskLog(string $taskId, string $taskEvent, string $taskMethod, $isHandleDone = false)
+    {
+        $handMsg = $isHandleDone ? ' handle done' : ' start handle';
+        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . $handMsg . '  task_id:' . $taskId . ' task_event: ' . $taskEvent . ' task_method: ' . $taskMethod . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -235,6 +252,7 @@ class TaskServer extends Server
     {
         $this->stop();
         $this->start();
+        return true;
     }
 
     /**

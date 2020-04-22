@@ -9,6 +9,7 @@
 namespace Hermes\Server;
 
 
+use Hermes\Core\Helper\PhpHelper;
 use Hermes\Server\Contract\ServerInterface;
 use Swoole\Process;
 use Swoole\Server as CoServer;
@@ -244,6 +245,18 @@ abstract class Server implements ServerInterface
             chmod($filePath, 0777);
         }
         file_put_contents(HERMES_ROOT . '/' . $this->pidFile, $mangerPid . ',' . $workerPid);
+    }
+
+    /**
+     * Get task global unique id
+     *
+     * @param int $taskId
+     *
+     * @return string
+     */
+    protected function getUniqId($taskId): string
+    {
+        return sprintf('%s%d', PhpHelper::uniqID('', true), $taskId);
     }
 
 }

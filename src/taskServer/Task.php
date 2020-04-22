@@ -8,6 +8,8 @@
 
 namespace Hermes\TaskServer;
 
+use Hermes\TaskServer\Exception\TaskException;
+use Hermes\TaskServer\Exception\TaskInvalidParamsException;
 use Redis;
 
 /**
@@ -32,65 +34,68 @@ class Task
     public const FD = 'fd';
 
     /**
-     * @var
-     */
-    private $host;
-
-    /**
-     * @var
-     */
-    private $port;
-
-    /**
      * @var Redis
      */
     private static $instance;
 
-    /**
-     * Task constructor.
-     * @param $host
-     * @param $port
-     */
-    public function __construct($host, $port)
-    {
-        $this->host = $host;
-        $this->port = $port;
-    }
 
     /**
      * @return Redis
+     * @throws TaskInvalidParamsException
+     * @throws TaskException
      */
-    private function getInstance()
+    private static function getInstance(): Redis
     {
         if (empty(static::$instance)) {
             $redis = new Redis;
-            $redis->connect($this->host, $this->port);
+            $config = self::getServerConfig();
+            if (!$redis->connect(...$config)) {
+                throw new TaskException('task redis server connect failed,please check server_params setting');
+            }
             static::$instance = $redis;
         }
         return static::$instance;
     }
 
     /**
-     * @param string $fd
+     * @return array
+     * @throws TaskInvalidParamsException
+     */
+    protected static function getServerConfig(): array
+    {
+        $config = require dirname(__DIR__, 5) . '/hermes_config.php';
+        if (empty($config['server_params']['host']) || empty($config['server_params']['port'])) {
+            throw new TaskInvalidParamsException('server_params host or port is invalid');
+        }
+        return [
+            $config['server_params']['host'],
+            $config['server_params']['port']
+        ];
+    }
+
+    /**
      * @param array $params
      * @return bool|int
+     * @throws TaskInvalidParamsException
+     * @throws TaskException
      */
-    protected function pushTask(array $params)
+    protected static function pushTask(array $params)
     {
-        return $this->getInstance()->lpush(static::FD, json_encode($params));
+        return self::getInstance()->lpush(static::FD, json_encode($params));
     }
 
 
     /**
-     * @param string $fd
      * @param string $taskEvent
      * @param string $method
      * @param array $params
      * @return bool|int
+     * @throws TaskInvalidParamsException
+     * @throws TaskException
      */
-    public function async(string $taskEvent, string $method, array $params)
+    public static function async(string $taskEvent, string $method, array $params)
     {
-        return $this->pushTask([$taskEvent, $method, $params]);
+        return self::pushTask([$taskEvent, $method, $params]);
     }
 
 }

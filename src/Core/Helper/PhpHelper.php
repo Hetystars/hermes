@@ -243,7 +243,27 @@ class PhpHelper
     {
         $fileArray = explode('/', $file);
         $fileName = date('Y-m-d') . '_' . array_pop($fileArray);
-        $fileArray[] = $fileName;
-        return implode('/', $fileArray);
+        $tmpFilePath = implode('/', $fileArray);
+        if (!is_dir($tmpFilePath)) {
+            mkdir($tmpFilePath, 0777);
+            chmod($tmpFilePath, 0777);
+        }
+        return $tmpFilePath . '/' . $fileName;
+    }
+
+
+    /**
+     * @param string $prefix
+     * @param bool $moreEntropy
+     *
+     * @return string
+     */
+    public static function uniqID(string $prefix = '', bool $moreEntropy = false): string
+    {
+        if (false === $moreEntropy) {
+            return uniqid($prefix, false);
+        }
+
+        return str_replace('.', '', uniqid($prefix, true));
     }
 }
