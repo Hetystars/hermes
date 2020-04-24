@@ -16,7 +16,8 @@ use Hermes\{
     Server\Exception\ServerException,
     Server\Server,
     TaskServer\Event\TaskEventTrait,
-    TaskServer\Exception\TaskException
+    TaskServer\Exception\TaskException,
+    TaskServer\Exception\TaskInvalidParamsException
 };
 use Swoole\Redis\Server as RedisServer;
 
@@ -115,6 +116,7 @@ class TaskServer extends Server
      * @param array $response
      * @return mixed
      * @throws TaskException
+     * @throws TaskInvalidParamsException
      */
     protected function taskResponse(string $taskId, string $taskEvent, string $taskMethod, $response)
     {
@@ -141,11 +143,16 @@ class TaskServer extends Server
      * @param string $taskEvent
      * @param string $taskMethod
      * @param bool $isHandleDone
+     * @throws TaskInvalidParamsException
      */
     protected function recoredTaskLog(string $taskId, string $taskEvent, string $taskMethod, $isHandleDone = false)
     {
+        $config = require dirname(__DIR__, 5) . '/hermes_config.php';
+        if (empty($config['server_params']['server_setting'])) {
+            throw new TaskInvalidParamsException('server_params server_setting is invalid');
+        }
         $handMsg = $isHandleDone ? ' handle done' : ' start handle';
-        file_put_contents(PhpHelper::formatLogFileWithDate($this->setting['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . $handMsg . '  task_id:' . (int)$taskId . ' task_event: ' . $taskEvent . ' task_method: ' . $taskMethod . PHP_EOL, FILE_APPEND);
+        file_put_contents(PhpHelper::formatLogFileWithDate($config['server_params']['server_setting']['response_log'] ?? static::RESPONSE_LOG), date('Y-m-d H:i:s') . $handMsg . '  task_id:' . (int)$taskId . ' task_event: ' . $taskEvent . ' task_method: ' . $taskMethod . PHP_EOL, FILE_APPEND);
     }
 
     /**
